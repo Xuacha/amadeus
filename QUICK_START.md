@@ -1,6 +1,84 @@
 # 🚀 QUICK START - SOLUCIONES IMPLEMENTADAS
 
+## � Cómo Obtener y Usar Amadeus
+
+### Opción 1: Descargar APK Compilado (Recomendado)
+```bash
+# Clonar el repositorio
+git clone https://github.com/Xuacha/amadeus.git
+cd amadeus
+
+# Compilar APK debug
+cd Amadeus
+./gradlew assembleDebug
+
+# APK generado en: app/build/outputs/apk/debug/app-debug.apk
+```
+
+### Opción 2: Compilar desde Cero
+```bash
+# Requisitos: Android SDK instalado
+cd Amadeus
+./gradlew clean build
+./gradlew assembleDebug
+```
+
+### Opción 3: Instalar en Dispositivo
+```bash
+# Conectar dispositivo Android
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+```
+
+---
+
 ## 📌 Dos Problemas Identificados y Reparados
+
+### ❌ Problema 1: "No se pudo extraer el audio, intenta pegar la URL directamente o selecciona un archivo local. Detalle: downloader is null"
+
+**Causa:** Race condition en inicialización de NewPipe.
+- `AmadeusApplication` intenta inicializar NewPipe en Main Thread
+- `AudioDownloadManager` intenta usarlo en IO Thread
+- **Resultado:** Fallo porque downloader aún no estaba inicializado
+
+**✅ Reparación Implementada:**
+```
+Archivo creado: services/NewPipeInitializer.kt
+├─ Singleton thread-safe para NewPipe
+├─ Solicita foco una sola vez
+└─ Ambos threads usan el mismo singleton garantizado
+```
+
+**Archivos actualizados:**
+- `AmadeusApplication.kt` — Usa NewPipeInitializer.initialize()
+- `AudioDownloadManager.kt` — Usa NewPipeInitializer.ensureInitialized()
+
+---
+
+### ❌ Problema 2: Audio no reproduce en Facebook/TikTok (solo funciona con auriculares)
+
+**Causa:** Retención de Audio Focus por Amadeus.
+- AudioAnalyzer solicita AudioFocus para grabar micrófono
+- En ColorOS, si una app retiene foco, otras pierden speaker
+- **Resultado:** Facebook/TikTok solo reproducen en auriculares
+
+**✅ Reparación Implementada:**
+```
+Archivo creado: services/AudioFocusManager.kt
+├─ Gestor centralizado de AudioFocus
+├─ Garantiza abandono de foco en todos los paths
+└─ Compatible con ColorOS OPPO
+```
+
+**Archivos actualizados:**
+- `AudioAnalyzer.kt` — Usa AudioFocusManager en startListening/stopListening
+- `MainActivity.kt` — Agrega onDestroy() y mejora onPause()
+
+---
+
+## 📂 Archivos Creados
+
+```
+NEW: app/src/main/java/com/gestionescolar/amadeus/services/
 
 ### ❌ Problema 1: "No se pudo extraer el audio, intenta pegar la URL directamente o selecciona un archivo local. Detalle: downloader is null"
 
