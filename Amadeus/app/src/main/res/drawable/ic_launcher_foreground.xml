@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Pentáculo en Crimson -->
+    <path
+        android:fillColor="#8B1A1A"
+        android:pathData="M54,15L63.2,43.2H93L68.9,60.7L78.1,88.9L54,71.4L29.9,88.9L39.1,60.7L15,43.2H44.8L54,15Z" />
+    <!-- Círculo central rojo brillante -->
+    <path
+        android:fillColor="#C41E1E"
+        android:pathData="M54,54m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+</vector>
